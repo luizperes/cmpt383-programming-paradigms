@@ -15,216 +15,161 @@
 \begin{document}
 \maketitle
 
-\section{Numerical Computation}
-Numerical Computational problems, especially in engineering and science, are frequently related to solving problems for large matrices (such as image processing). Many of the most efficient algorithms for large-scale matrix computations are based on approximations of the given matrix by small matrices (e.g. kernel convolution and Petrov-Galerkin projections).
+\section{Introduction}
+Regarding scientific programming, what programming languages should we use? What software libraries should we build upon? Our answers to such questions can be defined on the languages and/or paradigms we use.
+
+Numerical methods for scientific problems, especially in engineering and science, are frequently related to solving problems for large matrices (such as image processing). Many of the most efficient algorithms for large-scale matrix computations are based on approximations of the given matrix by small matrices (e.g. kernel convolution and Petrov-Galerkin projections).
 \\\\
-Traversing matrices is one of the heaviest numerical computations as, for a given matrix \textbf{m} with \textit{r} rows and \textit{c} columns, it has known time complexity of $O(r\times c)$. Imagine that we have a bitmap image \textbf{img} of size $800 \times 600$ with \textit{RGB} colors, for example. Now imagine that we want to convert \textbf{img} into its grayscale representation.  It that case, it would take a time of $800 \times 600 \times 3$ (we multiply by 3 because we must consider the space occupied by $red$, $green$ and $blue$) to traverse and convert every RGB pixel of \textbf{img} into its grayscale representation.
+Traversing matrices is one of the heaviest numerical computations as, for a given matrix \textbf{m} with \textit{r} rows and \textit{c} columns, it has known time complexity of $O(r\times c)$. Imagine that we have a bitmap image \textbf{img} of size $800 \times 600$ with \textit{RGB} colors, for example. Now imagine that we want to convert \textbf{img} into its grayscale representation.  In that case, it would take a time of $800 \times 600 \times 3$ (we multiply by 3 because we must consider the space occupied by $red$, $green$ and $blue$ values of each pixel) to traverse and convert every RGB pixel of \textbf{img} into its grayscale representation.
 \\\\
-The work below will try to prove that, for all (or most) different paradigms here compared \textit{(Functional Programming, Object-oriented Programming, Scripting Language and Imperative Programming)}, it should take about the same time complexity to traverse matrices, but the same might not be true for the memory allocation (some paradigms might take more memory).
-\section{Paradigms and Programming Languages}
-
-\textbf{ Actor/Message Passing/OOP - Erlang } \\
-Erlang is designed for concurrency and is used in many big projects whose main concerns are related to performing asynchronous tasks, such as Facebook Messenger. Erlang is a pure functional language and features single assignment and eager evaluation. In its actor model, each object is an actor. Messages can be exchanged among actors, which will be buffered in the object's mailbox. Upon receiving a message, an action will be taken by the actor. Messages are not guaranteed to be delivered in the same order as they were sent, however they are guaranteed to be always delivered.
-\\\\
-Concurrent programming in \textbf{Erlang} is built-in is done by sending asynchronous messages with and identifier so called \textit{Pid}(process identifier). The caller is able to do that by executing a command responsible by spawning a new \textit{Pid}: $pid = spawn(f)$, where $f$ is a function. See the example below:
-\lstset{language=erlang}
-\begin{lstlisting}[frame=single]
-start() ->
-   spawn(fun() -> sendMessage("Hi") end). 
-
-sendMessage(Message) ->
-   io:fwrite("~p",[Message]).
-\end{lstlisting}
-
-The code above will call $spaw$ sending a new concurrent process that evaluates $fun$. The new process runs in parallel with the caller and prints the message \textit{"Hi!"}. 
-\\\\
-Similarly, to receive a message passed by an \textit{spawned} function $f$, one will use the keyword $receive$ and pattern match the input. See below: 
-\begin{lstlisting}[frame=single]
-addFn() ->
-   receive 
-     {X, Y} -> 
-       io:fwrite("X + Y is: ~p~n",[X + Y]), 
-       addFn(); 
-   Other ->
-      io:fwrite("Unknown"), 
-      addFn() 
-   end. 
-
-start() ->
-   pid = spawn(fun() -> addFn() end), 
-   pid ! {6, 10}.
-\end{lstlisting}
-
-In the code snippet above, the output will be $16$, because $\{6, 10\}$ matches with the pattern $\{x,y\}$.
-
-\hfill
+The work below will try to prove that, for all (or most) different paradigms here compared \textit{(Functional Programming (Haskell), Object-oriented Programming (Java), Scripting Language (Python) and Imperative Programming (Fortran))}, it should take about the same time complexity to traverse and apply map functions to matrices, but the same might not be true for memory allocation (some paradigms might take more memory).
+\section{Applying numerical computations for different paradigms and programming languages}
 
 \textbf{ Functional Programming - Haskell }
 
-Given the lack of side effects, a Haskell program appears to have many opportunities for automatic
-parallelization, however, in practice, this may not work as beautiful as it seems because it creates many small items (high order functions are broken down by many other smaller functions) which can not be efficiently scheduled.
+Functional programming in general appears to have many beautiful ways of traversing matrices, given (in theory) the lack of side effects and its foundation of applying mathematical functions to the real world, however, in practice, this may not work as beautiful as it seems because a bigger problem may be divided into many small problems (function calls, as high order functions are always broken down in other smaller functions), which may impact on the speed of a given program, once that it would be faster if the process was done linearly$[5]$ (the way that imperative languages would try to solve this category of problems). Haskell will be the representative of the Functional Programming paradigm for this assignment.
 \\\\
-Haskell provides a mechanism to allow the user to control the of concurrency by indicating what computations may be done. To use the power of concurrency one must use the $Control.Concurrent$ module. For that, the use of $MVars$ is very important once they do the managing concurrent access to shared resources, and communicating across threads. See the code below:
+Haskell has many libraries for matrix handling, however, I chose to use the \textit{hmatrix} library as it is comparable with \textit{Python's numpy} library and it also provides helpers for common matrix operations.
+\\\\
+On the code below, you will see how one would convert a bitmap image into its grayscale representation in haskell.
+
 \lstset{language=haskell}
 \begin{lstlisting}[frame=single]
-import Control.Concurrent (forkIO,
-                           threadDelay)
+import Codec.BMP
+import System.Environment
+import System.IO
+import Numeric.LinearAlgebra
 
-main = do
-  res <- newEmptyMVar
+main
+ = do	[srcFile, dstFile] <- getArgs
 
-  forkIO (do
-    threadDelay (10000)
-    putMVar result 42
-    putStrLn "Wait! What's the question?")
-
-  putStrLn "Waiting for answer..."
-  value <- takeMVar result
-  putStrLn ("The answer is: " ++
-             show value)
+  handle <- openFile srcFile ReadMode
+  mBMP <- hGetBMP handle
+  
+  case mBMP of
+   Left  err -> print err
+   Right bmp ->
+     do let rgb = unpackBMPToRGBA32 bmp
+	 let (width, height) =
+	   bmpDimensions bmp
+	
+	 let m'   =
+	   toGrayScale width height rgb
+	 let svBmp' =
+	   packRGBA32ToBMP width height m'
+	 handle' <-
+	   openFile dstFile WriteMode
+	 hPutBMP handle' svBmp'
 \end{lstlisting}
 
-The output for the code above will be:
+The code above will open a bitmap image, get its height and width and then will traverse its pixel matrix and convert every single pixel into its grayscale (using the function \textit{toGrayScale}).
 \\\\
-\textbf{Waiting for answer...}\\
-\textit{// After 10 seconds }\\
-\textbf{The answer is: 42}\\
-\textbf{Wait! What's the question?}\\\\
+We realize that the program above will take most of its time to read, process and write the output of the given \textit{bmp} image. Also, \textit{toGrayScale} will run in linear time $O(|rows| \times |colums|)$. In order to be full functional, it would break every cell of the matrix down and apply a recursive function rebuilding and copying the matrix by passing it as a parameter to "keep" the state of the \textit{still-to-build} matrix. This will be evaluated later (on Assignment \#5).
 
 \textbf{ Object-oriented Programming - Java }\\
-Java is a high-level programming language that allows multi-threading, meaning that a given program does not have only one thread (the main thread), it may other threads that can run concurrently in order to solve one or more tasks. Many times, these different threads may be doing different tasks such as event-handling while the main thread is displaying screen elements, for example. We have multitasking when two or more processes share common resources (processing, memory and such).\\\\
-
-In Java, you must implement the \textit{Runnable} interface or extend the class \textit{Thread} if you want your code to be divided in multiple threads, allowing multitasking and consequently concurrency. Having a \textbf{Thread} class that implements \textit{Runnable}, you must implement a method named $run()$ (defined by the \textit{Runnable} interface). This method is called when your \textbf{thread object} is $started$. Check the example below:
+The way Object-oriented programming paradigm behaves regarding scientific programming can be related to the Object-oriented language we are using, because such paradigm is often implemented in multi-paradigm languages. For example, \textit{Java, Erlang, Objective-C and Pony} will most likely have different ways and use different methods for processing numerical computations. That happens because these languages are not only Object-oriented, but also imperative (for Java and Objective-C) and Process-Calculus-based(Erlang and Pony), a paradigm very close to Functional Programming, where "everything" is a process rather than a function. That is to say, Java will be representative language for this category, but what is true to Java might \textbf{not} be true to other different \textit{OOP languages}.
+\\\\
+Java is one of the \textit{C-family} languages$[11]$ and for this reason, scientific programming in pure Java can be \textbf{very} similar to scientific programming in C (not accounting direct access to pointers). In fact, it would be very hard to identify and distinguish scientific programs in pure Java or/and in pure C (not considering classes and particularities of the Object-oriented paradigm).
+\\\\
+Java has the benefit of having multiple frameworks for numerical computations, such as \textit{COLT, JLAPACK, ND4J, Matrix toolkit Java} and others. However, I chose to write numerical computations in pure Java for this assignment, as I would like to compare it with C (because the code is very similar, but there might be differences in runtime because of the different compilers for these languages and because Java's bytecode will be interpreted by the JVM). 
+\\
+The code below converts a bitmap image to its grayscale representation:
 
 \lstset{language=java}
 \begin{lstlisting}[frame=single]
-class ConcurrencyDemo implements Runnable {
-  private String tName;
-  private Thread t;
-   
-  ConcurrencyDemo( String tName) {
-    this.tName = tName;
-    System.out.println("Creating " + 
-                       tName );
-  }
-  
-  public void start () {
-    System.out.println("Initiating " +
-                        tName );
-    if (null == this.thread) {
-      this.t = new Thread (this, tName);
-      this.t.start ();
-    }
-  }  
-   
-  public void run() {
-    // your business logic will be here
-  }
-}
-
-public class ExecThread {
+public class ProcessBMP {
  public static void main(String args[]) {
-   ConcurrencyDemo t1 =
-     new ConcurrencyDemo( "1st Thread");
-   t1.start();
+   BufferedImage img = ImageIO.read(
+       getClass().getResource(bmp));
+   
+   int w = image.getWidth();
+   int h = image.getHeight();
+   int[][] matrix = new int[w][h];
+
+  // r = |rows|, c = |columns|
+  // w = width, h = height
+  for (int r = 0; r < w; r++) {
+    for (int c = 0; c < h; c++) {
+      int color = image.getRGB(r, c);
+      int gray  = image.toGrayScale(color);
+      matrix[r][c] = gray; 
+    }
+  }
  }   
 }
 \end{lstlisting}
 
-The code above will create an object that will run concurrent with our main thread.
+The code above will traverse the image as fast as C would do and in fact in very hard to distinguish the differences between that code and a given C code for the same task.
 
-\textit{ Obs.: We also realize that Java can be very verbose when dealing with concurrency. }
-\\\\
 \textbf{ Scripting Language - Python }
-\textit{Python} has a number of different concurrency \textbf{constructs} such as \textit{threading}, \textit{queues} and \textit{multiprocessing}. The \textit{threading} module used to be the primary way of accomplishing concurrency. Python is also largely used and you can find many open source libraries over the internet related to concurrent programming, once it requires a lot of legwork in order to implement (and understand) it, if you compare with languages prepared for that, such as \textit{Erlang}.
+As said before on previous assignments, scripting languages usually run slower than compiled languages (because of the time that is spent on just-in-time translations). Python has a slight advantage on other scripting languages because it uses many libraries written in pure C, boosting the process of interpreting programs.
 \\\\
-The code you will see below start 5 threads. If you think sequentially, the expected output would be $1$ through $5$, however, the operation does not wait for the threads to complete before moving on to the next print statement and the threading is not executed sequentially. To undertand it better, please check the following code and output:
+Python is multi-paradigm and allows \textbf{imperative programming} as well, just like \textit{Fortran, Java and C} and is reasonable to think that it will be one of fastest languages for this assignment. One point is that it is well known as a scientific programming language with numerous libraries out there, such as \textit{NumPy} (which is mostly written in C). Lastly, Python allows "hacks" for performance when dealing with matrix handling. For this assignment, it was chosen to use \textit{NumPy} for scientific programming.
+\\\\
+The code below takes bitmap image as input and outputs its grayscale representation:
 
 \lstset{language=python}
 \begin{lstlisting}[frame=single]
-from random import random
-from threading import Thread
-import time
+import numpy as np
 
-def worker(number):
-  slp = random.randrange(1, 10)
-  time.sleep(slp)
-  print("#{} ran asynchronously
-          for {} seconds"
-         .format(number, slp))
+def rgb2gray(rgb):
+    return np.dot(rgb[...,:3],
+      [0.299, 0.587, 0.114])
 
-for n in range(5):
-  thread = Thread(target=worker,
-      args=(i,))
-  thread.start()
-
-print("What is the sequence?")
+img = mpimg.imread(filename)     
+grayimg = rgb2gray(img)    
+mpimg.imsave(filename, grayimg)
 \end{lstlisting}
 
-The output of the code above will be different every time you run it, but on my test was:
+Compared to all other seen snippets, so far, Python is the one with clearest code and helps us understand why the scientific community enforce the use of this tool. We still need to check how fast it is indeed (in comparison with other programming paradigms and languages, such as \textit{Fortran and Java}).
 \\\\
-\textit{What is the sequence?}\\
-\textit{\#1 ran asynchronously for 1 seconds}\\
-\textit{\#3 ran asynchronously for 4 seconds}\\
-\textit{\#5 ran asynchronously for 6 seconds}\\
-\textit{\#2 ran asynchronously for 7 seconds}\\
-\textit{\#4 ran asynchronously for 8 seconds}
+\textbf{ Imperative - Fortran }
+\\
+Numerical computations are strongly encouraged by the \textit{Imperative programming} paradigm. \textit{Fortran, C and Assembly itself} are very powerful tools that help us to get close to the "bare" metal. The mentioned languages are very flexible and take full advantage of the Turing tape. On the other hand, they are subject of constant problems such as bugs, once they have many side effects. Depending on the program, we will choose speed over code safety (which would have on Haskell or other Functional Programming languages, for example). For this assignment, we will compare speed and therefore, this category is highly indicated to be one of the fastest ones. The chosen language for this assignment will be Fortran because of it was designed to work with scientific computations.
 \\\\
-In the example above, I created 5 new threads (other than the main thread) by using $Thread(...)$ (but it is possible to subclass it and implement the code the same way one would do in a more object-oriented style, such as Java). Each one of them, will sleep for a random number of seconds and only them print \textit{"\#thread ran asynchronously for `random` seconds"}.
+In spite of being a very old language (appeared for the first time on 1957), Fortran is somewhat currently one of the most important language for scientific and engineering computation and actually, there are some libraries to work with newer languages, such as the transpiler \textit{FORTRAN-to-Java (f2j)} that enables automatic translation of LAPACK to Java and many tools that do the same for C as well.
 \\\\
-\textbf{ Procedural - C }
-\\One must link the $pthread$ library in order to use most(if not all) of multithreading capabilities in \textbf{C}. There are a few particularities for that, such as:
-\\\\
-1. In the $main()$ method, we declare a variable (let us call it $tid$ or $pid$), with type of $pthread\_t$, which is type representing the id of a thread based on an integer (which is the same as explained on \textit{Erlang} for $pid$), used to retrieve and handle the thread in the system.
-\\\\
-2. After declaring $tid$, we then execute $pthread\_create()$, aiming to create a new concurrent process. It takes 4 arguments: a pointer to $tid$ (or $pid$), a set of attributes related to $tid$, a \textit{callback} of a function  $f_c$ (a function pointer, or a function address to a function that will be executed by the process) and the \textit{args} that the function $f_c$ will take.\\
-3. Lastly, we will need to use $pthread\_join$ if we want the to wait for the calling thread related to the thread identifier $tid$ (or $pid$) terminate.
+On the code below, we will see an example written in Fortran that will take an image as input and return its grayscale representation as output:
 
-\lstset{language=c}
+\lstset{language=fortran}
 \begin{lstlisting}[frame=single]
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-  
-void *asyncFun(void *args);
+program grayscale
+  implicit none
+  integer ihpixf, jvpixf
+  ! pixel and data size
+  parameter(ihpixf = 128, jvpixf = 128)
+  ! RGB image array (integer)
+  character*1 rgb(3,ihpixf,jvpixf)
+  ! three, 2D data array (float or double)
+  real*8  dat(3,ihpixf,jvpixf)
+  integer nframe, nf2
 
-int main()
-{
-  pthread_t tid;
-  printf("Before Thread\n");
-  pthread_create(&tid,
-                  NULL,
-                  asyncFun,
-                  NULL);
-  pthread_join(tid, NULL);
-  printf("After Thread\n");
-  return 0;
-}
+  do nframe = 1, 50
+    nf2 = nframe
+    call mkdata(dat,nf2)
+    call mkbitmap(dat,rgb)
+    call grayscale(rgb,nf2)
+  enddo
 
-void *asyncFun(void *args)
-{
-  sleep(1);
-  printf("Called from thread\n");
-  return NULL;
-}
+  stop
+end program grayscale
 \end{lstlisting}
 
-The code above then creates a $thread$ and $waits$ until it returns (we do that by calling $pthread\_join$).
+\textit{Obs.: the code above was not written by me, you can see the original code on [18]}
 
 \section{Evaluation}
-In order to evaluate all the languages and their capabilities related to currency, it will be tested:
+In order to evaluate all the languages and their capabilities related to scientific programming, it will be tested:
 \\\\
-- Behaviour of program when it is handling thousands of random threads.\\
-- Behaviour of program when possible \textit{deadlocks} may occur.\\
-- How long does a program take to respond to a given asynchronous request.\\
+- Behaviour of program when copying a very large matrix (size $100000000 \times 100000000$).\\
+- Behaviour of program when processing images (RGB image to grayscale representation).\\
+- How long does a program take to apply \textbf{gaussian filter} on convolutions of size $25 \times 25$ on a image of size $1024 \times 1024$.\\
 \\
 Tools for \textbf{measuring} that (\textit{code profilers} and others):\\
 \\
-- \textbf{Erlang}: native profiling \textit{fprof}.\\
 - \textbf{Haskell}: \textit{ghc} with option \textit{-prof}.\\
 - \textbf{Java}: \textit{jprofiler} tool.\\
 - \textbf{Python}: \textit{profile.py} library.\\
-- \textbf{C}: Mac OS native tool \textit{Instruments}.
+- \textbf{Fortran}: \textit{gprof} tool.\\
 
 \section{Evaluation Environment}
 Macbook Pro:\\
@@ -232,24 +177,27 @@ Macbook Pro:\\
 - 16GB RAM
 
 \section{Discussion}
-I believe that, after evaluating all languages, \textbf{Erlang}, \textbf{C} and \textbf{Python} will have better performance than \textbf{Haskell} and \textbf{Java}. That will happen because \textit{Erlang} is already designed to work with concurrency natively, whereas \textit{C} is designed to work very close to the machine level and to the \textit{OS}, having advantage over languages such as \textit{Java} and \textit{Haskell}. Likewise, most of \textit{Python} libraries are developed in \textit{C}, making it as fast as \textit{C}.\\\\
-Going further, without proper \textbf{benchmarks}, it will be hard to tell if \textit{Erlang} will execute faster and better than \textit{C} or \textit{Python}. If you consider that \textit{Erlang} does not have side effects by default (because it is also a functional language), one might say that it will be better if compared with many other powerful languages, however, side effects many times work as \textit{shortcuts} in processing. Languages such as \textit{Python} and \textit{C} could use this factor to improve speed their code up through optimization, while \textit{Erlang} would rely on its never-change state. It will be interesting to see how \textit{Erlang} will handle thousands of messages being received and sent from and to thousands of objects, while \textit{C} will let the programmer avoid problems such as \textit{deadlocks}.\\\\
-That being said, in spite of being very reliable, \textit{Haskell} will be executed very slow as said before, because it will try to break every single function in smaller functions (following Lambda Calculus principles), proving that Functional Programming Languages run slower than Imperative ones, for example. Regarding \textit{Java}, the \textit{JVM} is already by itself slower than most of them, as it is another layer of abstraction. \textit{Java} is expected to have other problems, such as bad handling of \textit{deadlocks}.\\\\
+I believe that, after evaluating all languages, \textbf{Fortran}, \textbf{Python} and \textbf{Java} will have better performance than \textbf{Haskell} for this assignment. That will happen because these three languages base themselves on the imperative paradigm and are able to perform fast scientific computations, whereas \textit{Haskell} will be constrained by the functional programming paradigm.
+\\\\
+I also think that \textit{Python} will be one of the fastest ones (together with Fortran) as it has libraries developed in \textit{C}, making it as fast as \textit{C}.\\\\
+Going further, without proper \textbf{benchmarks}, it will be hard to tell if \textit{Fortran} will execute faster and better than \textit{Java} or \textit{Python}.
+\\\\
+That being said, in spite of being very reliable, \textit{Haskell} will most likely execute slower than the other three chosen languages. As said before, it will try to break every single function in smaller functions (following Lambda Calculus principles), proving that Functional Programming Languages run slower than Imperative ones.
+\\\\
+Regarding \textit{Java}, the \textit{JVM} might help, depending on the type of computations (with JVM warm up), however, it is hard to predict as the JVM itself is another layer of abstraction. 
+\\\\
 To conclude, I believe that the rank of languages will end with:
 \\\\
-- \textbf{1st place: C}\\
-\textit{C} is chosen to be the best one because it is one of the oldest languages amongst this set of languages. It also has very fast libraries and awesome compilers (\textit{gcc} and \textit{clang}). C is designed to work very close to \textit{Assembly language} and is compiled, making its source as fast as our computers are.
+- \textbf{1st place: Python}\\
+\textit{Python} is chosen to be the best one (in comparison with the other ones in this assignment) because it has many libraries written in C, having advantage over other languages.
 \\\\
-- \textbf{2nd place: Erlang}\\
-As said before, \textit{Erlang} is designed for concurrent programming. It will probably run slower than C because it is compiled to \textit{bytecode} and only then interpreted by its virtual machine (like Java). However, I am placing that before \textit{Python} because of its roots based on multitasking.
+- \textbf{2nd place: Fortran}\\
+As said before, \textit{Fortran} is designed for scientific programming. It is also one of the oldest and most respect languages amongst this set of languages. It also has very fast libraries. It is very hard to say whether it will be faster or not than Python. It will require a very good evaluation on assignment \#5.
 \\\\
-- \textbf{3rd place: Python}\\
-Python should be the third fastest language as its libraries are mostly written in C. The third place goes by the fact that it is an interpreted language.
+- \textbf{3rd place: Java}\\
+The \textit{JVM} is slow, but not so slow. There still some advantage because of its \textit{JVM's} warm-up. Some people say that scientific programming in Java is actually possible and there are a lot of support for it on its community).
 \\\\
-- \textbf{4th place: Java}\\
-The \textit{JVM} is slow, but not so slow. There still some advantage because of its \textit{JVM's} warm-up. Some people say that concurrency in Java is not a very good idea (may even be the reason why \textit{Scala} has daily grown its community).
-\\\\
-- \textbf{5th place: Haskell}\\
+- \textbf{4th place: Haskell}\\
 I also believe strongly that \textit{Haskell} will take the last position because of the reasons discussed before on this assignment.
 \\\\
 I am looking forward to doing their benchmarks!
@@ -261,6 +209,35 @@ I am looking forward to doing their benchmarks!
 
 \bibitem{b3} "Big O notation", En.wikipedia.org, 2017. [Online]. Available: https://en.wikipedia.org/wiki/Big\_O\_notation. [Accessed: 28- Oct- 2017].
 
+\bibitem{b4} "Tweag I/O - Enter the matrix, Haskell style", Tweag.io, 2017. [Online]. Available: https://www.tweag.io/posts/2017-08-31-hmatrix.html. [Accessed: 28- Oct- 2017].
+
+\bibitem{b5} "Functional vs. Imperative Programming", Ryanhmckenna.com, 2017. [Online]. Available: http://www.ryanhmckenna.com/2014/11/functional-vs-imperative-programming.html. [Accessed: 28- Oct- 2017].
+
+\bibitem{b6} "hmatrix", 2017. [Online]. Available: http://dis.um.es/~alberto/material/hmatrix.pdf. [Accessed: 28- Oct- 2017].
+
+\bibitem{b7} "For scientific computing, is Java useful in a way that C or Python aren't? - Quora", Quora.com, 2017. [Online]. Available: https://www.quora.com/For-scientific-computing-is-Java-useful-in-a-way-that-C-or-Python-arent. [Accessed: 28- Oct- 2017].
+
+\bibitem{b8} "Scientific Computation", Introcs.cs.princeton.edu, 2017. [Online]. Available: https://introcs.cs.princeton.edu/java/90scientific/. [Accessed: 28- Oct- 2017].
+
+\bibitem{b9} "Java And Cpp Platforms For Scientific Computing", 2017. [Online]. Available: https://inside.mines.edu/~dhale/papers/Hale06JavaAndCppPlatformsForScientificComputing.pdf. [Accessed: 28- Oct- 2017].
+
+\bibitem{b10} P. Knoll and S. Mirzaei, "Scientific computing with Java", 2017.
+
+\bibitem{b11} "List of C-family programming languages", En.wikipedia.org, 2017. [Online]. Available: https://en.wikipedia.org/wiki/List\_of\_C-family\_programming\_languages. [Accessed: 28- Oct- 2017].
+
+\bibitem{12} "Scientific Computing Tools for Python — SciPy.org", Scipy.org, 2017. [Online]. Available: https://www.scipy.org/about.html. [Accessed: 28- Oct- 2017].
+
+\bibitem{13} "1.1. Python scientific computing ecosystem — Scipy lecture notes", Scipy-lectures.org, 2017. [Online]. Available: http://www.scipy-lectures.org/intro/intro.html. [Accessed: 28- Oct- 2017].
+
+\bibitem{14} "A Primer on Scientific Programming with Python", 2017. [Online]. Available: https://hplgit.github.io/primer.html/doc/pub/half/book.pdf. [Accessed: 28- Oct- 2017].
+
+\bibitem{15} "Fortran", En.wikipedia.org, 2017. [Online]. Available: https://en.wikipedia.org/wiki/Fortran. [Accessed: 28- Oct- 2017].
+
+\bibitem{16} "Programming in FORTRAN", Chem.ox.ac.uk, 2017. [Online]. Available: http://www.chem.ox.ac.uk/fortran/fortran1.html. [Accessed: 28- Oct- 2017].
+
+\bibitem{17} "Scientific computing’s future: Can any coding language top a 1950s behemoth?", Ars Technica, 2017. [Online]. Available: https://arstechnica.com/science/2014/05/scientific-computings-future-can-any-coding-language-top-a-1950s-behemoth/. [Accessed: 28- Oct- 2017].
+
+\bibitem{18} Sun.stanford.edu, 2017. [Online]. Available: http://sun.stanford.edu/~keiji/pixelfrt.for. [Accessed: 28- Oct- 2017].
 
 \end{thebibliography}
 \end{document}
