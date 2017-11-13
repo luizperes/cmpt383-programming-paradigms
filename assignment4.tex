@@ -23,13 +23,15 @@ Traversing matrices is one of the heaviest numerical computations as, for a give
 \\\\
 The work below will discuss and illustrate how efficiently different paradigms use matrices to solve a given problem. The paradigms used will be \textit{(Functional Programming (Haskell), Object-oriented Programming (Java), Scripting Language (Python), Imperative Programming (Go) and Procedural Programming(C))}. For each paradigm here discussed, the programs are expected to vary in time complexity to traverse and apply map functions to matrices for large inputs as well as vary in resources (memory) allocation, as some paradigms might take more memory than others.
 \\\\
-Finally, it will be implemented, evaluated and discussed the map functions \textbf{add}, \textbf{multiply} and \textbf{custom} for each paradigm/language described above. Each one of these map functions take a \textit{matrix} \textbf{m} as input and return a \textit{matrix} \textbf{m'} as output. They can be represented mathematically as:
+Furthemore, it will be implemented, evaluated and discussed the map functions \textbf{add}, \textbf{multiply} and \textbf{custom} for each paradigm/language described above. Each one of these map functions take a \textit{matrix} \textbf{m} as input and return a \textit{matrix} \textbf{m'} as output. They can be represented mathematically as:
 
 \begin{itemize}
 	\item \textbf{add}: $c_{ij} = a_{ij} + b_{ij}$
 	\item \textbf{multiply}: $c_{ij} = a_{ik} \times b_{kj}$
 	\item \textbf{custom}: $c_{ij} = max(a_{ij}, b_{ij}) + a_{ij}^2 + b_{ij}^2$
 \end{itemize}
+
+Finally, the map functions described above will be compared against a data $d$ starting from a matrix $m$ of size $10\times10$ and will then be increased of an order of magnitude $100\times100$ until we notice that the target code takes longer to execute.
 
 \section{Related Work, Background and Applications}
 Representation Theory is the field of study that uses matrices representations for problem solving  $[19]$. All finite groups can be represented as matrices, and, therefore, matrices are a very useful tool for studying finite groups.
@@ -51,15 +53,34 @@ That is to say, scientific programming is related to many fields and therefore i
 \textbf{ Object-oriented Programming - Java }\\
 The way Object-oriented programming paradigm behaves regarding scientific programming can be related to the Object-oriented language we are using, because such paradigm is often implemented in multi-paradigm languages. For example, \textit{Java, Erlang, Objective-C and Pony} will most likely have different ways and use different methods for processing numerical computations. That happens because these languages are not only Object-oriented, but also imperative (for Java and Objective-C) and Process-Calculus-based(Erlang and Pony), a paradigm very close to Functional Programming, where "everything" is a process rather than a function. That is to say, Java will be representative language for this category, but what is true to Java might \textbf{not} be true to other different \textit{OOP languages}.
 \\\\
-Java is one of the \textit{C-family} languages$[11]$ and for this reason, scientific programming in pure Java can be \textbf{very} similar to scientific programming in C (not accounting direct access to pointers). In fact, it would be very hard to identify and distinguish scientific programs in pure Java or/and in pure C (not considering classes and particularities of the Object-oriented paradigm).
+Java is one of the \textit{C-family} languages$[11]$ and for this reason, scientific programming in pure Java can be \textbf{very} similar to scientific programming in C (not accounting direct access to pointers).
 \\\\
 Java has the benefit of having multiple frameworks for numerical computations, such as \textit{COLT, JLAPACK, ND4J, Matrix toolkit Java} and others. However, I chose to write numerical computations in pure Java for this assignment, as I would like to compare it with C (because the code is very similar, but there might be differences in runtime because of the different compilers for these languages and because Java's bytecode will be interpreted by the JVM). 
 \\
-On the code snippets below, you will see how one would represent the map functions \textbf{add}, \textbf{multiply} and \textbf{custom} in Java.
+On the code below, you will see how one would represent the map functions \textbf{add}, \textbf{multiply} and \textbf{custom} in Java.
 \\
 \includegraphics[scale=0.57]{java_code}
 
-The previous Java code will traverse matrices as fast as C would do and in fact (with limitations on the JVM), it is very hard to distinguish the differences between that code and a given C code for the same task. You can of course see that the Java code is very verbose regarding such simple functions. In order to execute the code, we will need to have a \textit{Java class} that implements the \textit{main} function. In this way, our class will be instantiated into an object of type \textbf{Matrix} and only them, after setting it up properly, we would be able to use all the power of this language. Also, this Java code allows us to use custom sizes for our data $d$ described on the introduction 
+The previous Java code will traverse matrices as fast as C would do and in fact (with limitations on the JVM), it is very hard to distinguish the differences between that code and a given C code for the same task. You can of course see that the Java code is very verbose regarding such simple functions. In order to execute the code, we will need to have a \textit{Java class} that implements the \textit{main} function. In this way, our class will be instantiated into an object of type \textbf{Matrix} and only them, after setting it up properly, we would be able to use all the power of this language. Also, this Java code allows us to use custom sizes for our data $d$ described on the introduction of this work. 
+
+\textbf{ Scripting Language - Python }
+As said before on previous assignments, scripting languages usually run slower than compiled languages (because of the time that is spent on just-in-time translations). Python has a slight advantage on other scripting languages because it uses many libraries written in pure C, boosting the process of interpreting programs.
+\\\\
+Python is multi-paradigm and allows \textbf{imperative programming} as well, just like \textit{Java and C} and is reasonable to think that it will be one of best languages for this assignment. One point is that it is well known as a scientific programming language with numerous libraries out there, such as \textit{NumPy} (which is mostly written in C). Lastly, Python allows "hacks" for performance when dealing with matrix handling. Although, for this assignment, it will be used standard Python with no libraries as requested.
+\\\\
+Compared to other languages, Python is the one of the ones with clearest code and helps us understand why the scientific community enforce the use of this tool. The code below represents how one would implement the map functions \textbf{add}, \textbf{multiply} and \textbf{custom} in Python.
+
+\includegraphics[scale=0.62]{python_code}
+
+Python is one of the most beautiful languages out there, in my opinion. Compared to the Java code, its code is about \textit{50\%} smaller and is much simpler to read. However, it has some problems as well. In pure Python, without \textit{NumPy}, Python was extremely slow. We shall see more on that on our Results.
+
+\textbf{ Procedural Programming - C }
+
+Procedural programming, as its name suggests, bases itself in procedure, functions or sub-routines calls (not to be confused with mathematical functions related to functional programming). It also follows the imperative paradigm as it makes explicit reference to changing-state, performs a series of well-structured sequential steps and may have side effects. Systematically, it embraces a succession of statements and functions to perform a computational task or program. Pascal, C and Go are example of procedural languages. For this assignment, however, \textit{C} was picked because I believe that it will be one of the fastest languages in this assignment (if not the fastest). C has complete power over the machine and its imperative/procedural structures allow programmers to design code as well as one would do in pure Assembly.
+\\\\
+On the code below, you will see how one would represent the map functions \textbf{add}, \textbf{multiply} and \textbf{custom} in C.
+
+\includegraphics[scale=0.62]{c_code}
 
 \textbf{ Functional Programming - Haskell }
 
@@ -67,36 +88,60 @@ Functional programming in general appears to have many beautiful ways of travers
 \\\\
 On the code below, you will see how one would represent the map functions \textbf{add}, \textbf{multiply} and \textbf{custom} in Haskell.
 
+\includegraphics[scale=0.60]{haskell_code}
 
-
-\textbf{CODE HERE}
-
-\textbf{ Scripting Language - Python }
-As said before on previous assignments, scripting languages usually run slower than compiled languages (because of the time that is spent on just-in-time translations). Python has a slight advantage on other scripting languages because it uses many libraries written in pure C, boosting the process of interpreting programs.
+\textbf{ Imperative Programming - Go }
+Differently from the Functional Programming, Imperative programming is a programming paradigm that uses statements that change a program's state. In much the same way that the imperative mood in natural languages expresses commands, an imperative program consists of commands for the computer to perform.\\\\
+Go is a multiparadigm language and it was chosen as the Imperative Programming representative because of its Imperative/Procedural/Object-oriented nature. In this way, it will be nice to compare against another OO language (Java) and another Procedural language (C). Go syntax includes changes from C aimed at keeping code concise and readable.\\\\
+Because Go is Imperative, changing states and side effects are strongly encouraged in order to run it faster.\\\\
+Being able of optimizing and giving the change to programmers to change the behaviour of an algorithm with extern data (side effects) can be good and bad. It might be a positive point regarding its flexibility, but on the other side, it also makes systems more complex, being more open to human errors.
 \\\\
-Python is multi-paradigm and allows \textbf{imperative programming} as well, just like \textit{Fortran, Java and C} and is reasonable to think that it will be one of fastest languages for this assignment. One point is that it is well known as a scientific programming language with numerous libraries out there, such as \textit{NumPy} (which is mostly written in C). Lastly, Python allows "hacks" for performance when dealing with matrix handling. For this assignment, it was chosen to use \textit{NumPy} for scientific programming.
-\\\\
-The code below takes bitmap image as input and outputs its grayscale representation:
+The code below represents the map functions \textbf{add}, \textbf{multiply} and \textbf{custom} in Go.
 
-\lstset{language=python}
-\begin{lstlisting}[frame=single]
-import numpy as np
-
-def rgb2gray(rgb):
-    return np.dot(rgb[...,:3],
-      [0.299, 0.587, 0.114])
-
-img = mpimg.imread(filename)     
-grayimg = rgb2gray(img)    
-mpimg.imsave(filename, grayimg)
-\end{lstlisting}
-
-Compared to all other seen snippets, so far, Python is the one with clearest code and helps us understand why the scientific community enforce the use of this tool. We still need to check how fast it is indeed (in comparison with other programming paradigms and languages, such as \textit{Fortran and Java}).
+\includegraphics[scale=0.42]{go_code}
 
 \section{Results}
 
-\section{Discussion}
+The results below represent the time execution for the languages here compared. The evaluation was on done a \textbf{sparsed} and \textbf{dense} matrices \textbf{m} and data $d$:
 
+\begin{itemize}
+\item $10\times10$
+\item $100\times100$
+\item $1000\times1000$
+\item $10000\times10000$
+\item $100000\times100000$
+\end{itemize} 
+
+The time execution is as described on the Graph below:
+
+\includegraphics[scale=0.30]{data_ass4}
+
+We can see that the smaller the bar, the faster the language is. On the discussion section will be given details about the time execution of each language/paradigm.
+
+\section{Discussion}
+After evaluating all languages, \textbf{C}, \textbf{Go} and \textbf{Java} have better performance than \textbf{Haskell} and \textbf{Python} for this assignment. That happens because these three languages base themselves on the imperative paradigm and are able to perform fast scientific computations, whereas \textit{Haskell} will be constrained by the functional programming paradigm and \textit{Python} is a Script Language.
+\\\\
+Before evaluating these languages, I thought that \textit{Python} would be one of the fastest ones (together with C and Go) as it has libraries developed in \textit{C}, making it as fast as \textit{C}. But in practice, it did not happen. Python (pure) was the slowest language and did not complete more than 60\% of the benchmarks.\\\\
+That being said, in spite of being very reliable (related to code safety and complexity), \textit{Haskell} was the second slowest languages. In my preview assignments, I said that it would most likely run slower than the others, proving that Functional Programming Languages run slower than Imperative ones, in general.
+\\\\
+Regarding \textit{Java}, the \textit{JVM} warm up gave a huge boost to the execution of the scientific computations here evaluated.
+\\\\
+To conclude, the rank of languages ended up with:
+\\\\
+- \textbf{1st place: C}\\
+\textit{C} is evaluated as the best one (in comparison with the other ones in this assignment) because of its native advantages over the other languages. C is also one of the oldest languages amongst this set as has proven that it is indeed very optimized.
+\\\\
+- \textbf{2nd place: Go}\\
+Go is the newest and one of most respected languages amongst this set of languages. It also has very fast libraries. Its position is due to the fact that it is done by Google researches and they based on C (and other languages) to develop it.
+\\\\
+- \textbf{3rd place: Java}\\
+The \textit{JVM} is slow, but not so slow. There still some advantage because of its \textit{JVM's} warm-up. Some people say that scientific programming in Java is actually possible and there are a lot of support for it on its community, which was proved in this assignment.
+\\\\
+- \textbf{4th place: Haskell}\\
+I also believe strongly that \textit{Haskell} will took the second last position because of the reasons discussed before on this assignment.
+\\\\
+- \textbf{5th place: Python}\\
+\textit{Python} is the slowest languages (in comparison with the other ones in this assignment) because of its interpreted properties. Although it has many libraries written in C, having advantage over other languages, when you program in pure Python, it did not help the execution of the program.
 \begin{thebibliography}{00}
 \bibitem{b1} "IWASEP", 2017. [Online]. Available: http://www4.ncsu.edu/~ipsen/ps/slides\_iwasep.pdf. [Accessed: 28- Oct- 2017].
 
