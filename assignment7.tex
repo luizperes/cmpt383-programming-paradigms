@@ -1,0 +1,54 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{listings} 
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\title{\#7 Assignment - CMPT 383}
+\author{Luiz Fernando Peres de Oliveira - 301288301 - lperesde@sfu.ca}
+\date{December 4th, 2017}
+\begin{document}
+\maketitle
+\section{Memory}
+Allocating memory in C++ (and most of languages) can be done statically or dynamically. In static allocated memory, all memory allocation calculations can be done before the program runs, while dynamic allocated memory can only be determined in runtime. Static memory is allocated by the system from the \textbf{stack} and dynamic memory is allocated by the system from the \textbf{heap}.
+\\\\
+In C++, dynamic memory is usually allocated using the operator \textbf{new} or by using the C library \textit{stdlib} directly. When you allocate dynamic memory in C++, the system returns a pointer to beginning of the sequence of bytes (block of memory). It is important to notice that memory is a finite resource and therefore, there are limitations on dynamic memory allocation. For this reason, a request to dynamic allocation of memory cannot be 100\% guaranteed by the system.
+\\\\
+Moreover, if an user tries to allocated more memory than it is physically available (the system can also limit a program's memory), it will be thrown an exception \textit{bad\_alloc}, informing that the system did not granted the requested memory. It is however possible to suppress such exception in C++ by using the keyword \textit{nothrow}. Eg.: $mem = new (nothrow) int [3];$
+\section{Paradigms}
+The lowest level abstraction of a computer programs is \textbf{machine code}, which is the binary assembly representation of a program (a machine code or \textit{object code} contains literally 0's and 1's). Usually, high-level compilers (such as clang or clang++) compile their source code to Assembly language. From there, the Assembly code is then assembled to machine code by a program called Assembler. The Assembler assembles Assembly into machine code by mapping opcodes (Assembly instructions) in an usually one-to-one conversion, depending on the level of abstractions that the Assembly code may have and the Assembler may support.
+\\\\
+Assembly Language (and therefore machine code) falls under the imperative paradigm because, Assembly, as any imperative language uses statements or instructions that change a program's state. In order to program in Assembly, one must describe all the steps the machine must take in order to accomplish a given task. In fact, high-level imperative programming languages such as \textit{Fortran} and \textit{C} are abstractions of Assembly Language.
+\\\\
+Speaking of high-level and low-level programming languages, one might understand their main characteristics by their main differences. That is to say, a high-level language is a programming language (such as \textit{Java} and \textit{Python}) that allows programmers to write code that is not hardware specific, while a low-level programming is a very specific language that is possibly the closest mean of communication between a human and the bare metal, for instance Assembly and machine code. Moreover, high-level programming languages are more human-readable than low-level languages. Some say however that it exists another category between high-level and low-level so called mid-level programming languages, a category that puts \textit{C}, \textit{C++} and most system programming languages. This category would take a few characteristics of both low-level and high-level programming languages. 
+\section{Functional Programming}
+\section{Programming Questions}
+1. Create an Object data structure in \textbf{C}.
+\lstset{language=c}
+\begin{lstlisting}[frame=single]
+typedef struct _Point {
+  float x;
+  float y;
+} Point;
+\end{lstlisting}
+
+\begin{thebibliography}{00}
+\bibitem{b1} "Function Types", Bartosz Milewski's Programming Cafe, 2017. [Online]. Available: https://bartoszmilewski.com/2015/03/13/function-types/. [Accessed: 29- Nov- 2017].
+
+\bibitem{b2} "Dynamic memory - C++ Tutorials", Cplusplus.com, 2017. [Online]. Available: http://www.cplusplus.com/doc/tutorial/dynamic/. [Accessed: 04- Dec- 2017].
+
+\bibitem{b3} A. code?, "Assembly code vs Machine code vs Object code?", Stackoverflow.com, 2017. [Online]. Available: https://stackoverflow.com/questions/466790/assembly-code-vs-machine-code-vs-object-code. [Accessed: 04- Dec- 2017].
+
+\bibitem{b4} "Programming paradigm", En.wikipedia.org, 2017. [Online]. Available: https://en.wikipedia.org/wiki/Programming\_paradigm. [Accessed: 04- Dec- 2017].
+
+\bibitem{b5} "Imperative programming", En.wikipedia.org, 2017. [Online]. Available: https://en.wikipedia.org/wiki/Imperative\_programming. [Accessed: 04- Dec- 2017].
+
+\bibitem{b6} "Computers for Beginners/Programming - Wikibooks, open books for an open world", En.wikibooks.org, 2017. [Online]. Available: https://en.wikibooks.org/wiki/Computers\_for\_Beginners/Programming. [Accessed: 04- Dec- 2017].
+
+\end{thebibliography}
+\end{document}
