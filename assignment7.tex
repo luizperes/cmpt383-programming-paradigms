@@ -27,16 +27,101 @@ Assembly Language (and therefore machine code) falls under the imperative paradi
 \\\\
 Speaking of high-level and low-level programming languages, one might understand their main characteristics by their main differences. That is to say, a high-level language is a programming language (such as \textit{Java} and \textit{Python}) that allows programmers to write code that is not hardware specific, while a low-level programming is a very specific language that is possibly the closest mean of communication between a human and the bare metal, for instance Assembly and machine code. Moreover, high-level programming languages are more human-readable than low-level languages. Some say however that it exists another category between high-level and low-level so called mid-level programming languages, a category that puts \textit{C}, \textit{C++} and most system programming languages. This category would take a few characteristics of both low-level and high-level programming languages. 
 \section{Functional Programming}
+\textbf{Lazy evaluation} is a method that evaluates expressions (possibly \textit{"infinite"} elements) in runtime. The elements in a lazy evaluation are not bound to variables by default. Instead, the program waits until these values are needed by other computations and only them generates and evaluates them "on the fly". Lazy evaluation is also called called-by-name and it is the opposite of eager evaluation or \textbf{call-by-value}, which is the most used strategy for evaluation of expressions in programming languages.
+\\\\
+Another type of evaluation in languages such as Haskell is \textbf{strictly}, which is an annotation to force evaluation that might be needed when a given function calls another function, e.g $x:(h (g x)$. This kind of annotations become very handy when dealing with partial functions, for example.
+\\\\
+Lastly, as some aspects of functional programming are becoming very popular, such as the \textbf{lambda expressions}, some multiparadigms languages like \textit{C++}, \textit{Python} and \textit{Java} have become to give more and more support to functional programming. In C++, for instance, it is already possible to write \textit{functional combinators} as well as \textit{lambdas expressions}. Likewise, \textbf{Java 8} has included \textit{higher order functions} as native values, making \textit{chain call} possible for functions.
+\newpage  
 \section{Programming Questions}
-1. Create an Object data structure in \textbf{C}.
-\lstset{language=c}
+1. In \textbf{Haskell}, define the logical disjunction operator (i.e., boolean OR) four different ways using pattern matching.
+\lstset{language=Haskell}
 \begin{lstlisting}[frame=single]
-typedef struct _Point {
-  float x;
-  float y;
-} Point;
+data MyBool = True | False
+OR1 :: MyBool -> MyBool -> MyBool
+OR1 False False = False
+OR1 _ _         = True
+
+OR2 :: MyBool -> MyBool -> MyBool
+OR2 False False = False
+OR2 False True  = True
+OR2 True  False = True
+OR2 True  True  = True
+
+OR3 :: MyBool -> MyBool -> MyBool
+OR3 True _ = True
+OR3 _ True = True
+OR3 _ _    = False
+
+OR4 :: MyBool -> MyBool -> MyBool
+OR4 False False = False
+OR4 _ True      = True
+OR4 True _      = True
 \end{lstlisting}
 
+2. In an Object-oriented language (i.e., C++) create a function class. The idea is this class can accept functions as arguments as well as return functions. The class should be an abstract base class which must be inherited/extended/interfaced from in order to derive a concrete class.
+\lstset{language=c++}
+\begin{lstlisting}[frame=single]
+class InputIt {
+public:
+  virtual void f() = 0;
+};
+class UnaryFunction {
+public:
+  virtual void f2() = 0;
+};
+template<class InputIt,
+         class UnaryFunction>
+UnaryFunction for_each(InputIt first,
+                       InputIt last,
+                       UnaryFunction f)
+{
+  for (; first != last; ++first) {
+    f(*first);
+  }
+  return f;
+}
+
+int main() {
+  std::vector<double> v{
+    1.0, 2.2, 4.0, 5.5, 7.2
+  };
+  double r = 4.0;
+  std::for_each(v.begin(),
+                v.end(),
+                [&](double & v) {
+                  v += r;
+  });
+  std::for_each(v.begin(),
+                v.end(),
+                [](double v) {
+                  std::cout << v << " ";
+  });
+\end{lstlisting}
+3. In C create a function that returns a function. Create another function that takes functions as arguments.
+\lstset{language=c}
+\begin{lstlisting}[frame=single]
+#include <stdio.h>
+
+typedef void (*Callback)(char *value);
+
+void executeBlock(Callback block) {
+  block("Awesome callback");
+}
+
+void returnThisOne(char *value) {
+  printf("Value: %s", value);
+}
+
+Callback returnBlock() {
+  return returnThisOne;
+}
+
+int main() {
+  executeBlock(returnBlock());
+  return 0;
+}
+\end{lstlisting}
 \begin{thebibliography}{00}
 \bibitem{b1} "Function Types", Bartosz Milewski's Programming Cafe, 2017. [Online]. Available: https://bartoszmilewski.com/2015/03/13/function-types/. [Accessed: 29- Nov- 2017].
 
@@ -49,6 +134,20 @@ typedef struct _Point {
 \bibitem{b5} "Imperative programming", En.wikipedia.org, 2017. [Online]. Available: https://en.wikipedia.org/wiki/Imperative\_programming. [Accessed: 04- Dec- 2017].
 
 \bibitem{b6} "Computers for Beginners/Programming - Wikibooks, open books for an open world", En.wikibooks.org, 2017. [Online]. Available: https://en.wikibooks.org/wiki/Computers\_for\_Beginners/Programming. [Accessed: 04- Dec- 2017].
+
+\bibitem{b7} "Lazy evaluation - HaskellWiki", Wiki.haskell.org, 2017. [Online]. Available: https://wiki.haskell.org/Lazy\_evaluation. [Accessed: 05- Dec- 2017].
+
+\bibitem{b8} "Functional Programming Lazy Evaluation", www.tutorialspoint.com, 2017. [Online]. Available: https://www.tutorialspoint.com/functional\_programming/functional
+\_programming\_lazy\_evaluation.htm. [Accessed: 05- Dec- 2017].
+
+\bibitem{b9} "Eager evaluation", En.wikipedia.org, 2017. [Online]. Available: https://en.wikipedia.org/wiki/Eager\_evaluation. [Accessed: 05- Dec- 2017].
+
+\bibitem{b10} [16]"Performance/Strictness - HaskellWiki", Wiki.haskell.org, 2017. [Online]. Available: https://wiki.haskell.org/Performance/Strictness\#Evaluating
+\_expressions\_strictly. [Accessed: 05- Dec- 2017].
+
+\bibitem{b11} "Functional programming in C++", Blog.madhukaraphatak.com, 2017. [Online]. Available: http://blog.madhukaraphatak.com/functional-programming-in-c++/. [Accessed: 05- Dec- 2017].
+
+\bibitem{b12} "Flying Bytes • An Introduction to Functional Programming in Java 8: Part 1 - Functions as Objects", Flyingbytes.github.io, 2017. [Online]. Available: https://flyingbytes.github.io/programming/java8/functional/part1/2017/01/23/Java8-Part1.html. [Accessed: 05- Dec- 2017].
 
 \end{thebibliography}
 \end{document}
